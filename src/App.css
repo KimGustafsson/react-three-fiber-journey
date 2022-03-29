@@ -1,7 +1,9 @@
 .App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   text-align: center;
   background-color: #282c34;
-  min-height: 100vh;
 }
 
 .App-logo {
@@ -24,6 +26,16 @@
   justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+section > * {
+  flex: 1;
 }
 
 /* @keyframes App-logo-spin {
