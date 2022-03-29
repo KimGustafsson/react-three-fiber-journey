@@ -8,7 +8,6 @@
 
 .App-logo {
   height: 5vmin;
-  pointer-events: none;
   margin: 2rem;
 }
 
@@ -26,6 +25,8 @@
   justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
+  pointer-events: none;
+  user-select: none;
 }
 
 section {
