@@ -37,15 +37,15 @@ const Plane = (props) => {
 
   return (
     <mesh receiveShadow ref={ref}>
-      <planeGeometry args={[50, 50]} />
-      <meshStandardMaterial />
+      <planeGeometry args={[20, 20]} />
+      <meshStandardMaterial color={'#282c34'} />
     </mesh>
   );
 };
 
 const Lights = (props) => {
   const light = useRef();
-  useHelper(light, DirectionalLightHelper);
+  // useHelper(light, DirectionalLightHelper);
   const shadowMapSize = 512 * 2;
 
   return (
@@ -61,6 +61,27 @@ const Lights = (props) => {
       />
       <ambientLight intensity={1} />
     </>
+  );
+};
+
+const Particles = ({ amount, size, spread }) => {
+  const positions = new Float32Array(amount * 3);
+
+  for (let i = 0; i < amount * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * spread;
+  }
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute
+          attachObject={['attributes', 'position']}
+          count={positions.length / 3}
+          itemSize={3}
+          array={positions}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={size} sizeAttenuation />
+    </points>
   );
 };
 
@@ -84,11 +105,13 @@ function App() {
             position: [cameraPosition, cameraPosition, cameraPosition],
           }}
         >
+          <fog attach='fog' color='hotpink' near={1} far={60} />
           <OrbitControls />
-          <Box position={[-1.2, 0, 0]} />
-          <Box position={[1.2, 0, 0]} />
+          <Lights />
+          <Particles amount={20000} size={0.05} spread={40} />
           <Physics>
-            <Lights />
+            <Box position={[-1.2, 0, 0]} />
+            <Box position={[1.2, 0, 0]} />
             <Plane />
           </Physics>
         </Canvas>
