@@ -11,22 +11,15 @@
   margin: 2rem;
 }
 
-/* @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-} */
-
 .App-header {
-  min-height: 10vh;
+  position: absolute;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
   pointer-events: none;
   user-select: none;
+  z-index: 2;
 }
 
 section {
@@ -38,12 +31,3 @@ section {
 section > * {
   flex: 1;
 }
-
-/* @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */
