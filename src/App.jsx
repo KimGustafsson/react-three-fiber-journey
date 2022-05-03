@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { usePlane, Physics } from '@react-three/cannon';
-import { OrbitControls } from '@react-three/drei';
+import { ScrollControls, Scroll, useScroll } from '@react-three/drei';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import * as THREE from 'three';
 
@@ -109,6 +109,7 @@ const Lights = (props) => {
   return (
     <>
       <directionalLight
+        {...props}
         ref={light}
         position={[2, 5, 2]}
         castShadow
@@ -143,41 +144,32 @@ const Particles = ({ amount, size, spread }) => {
   );
 };
 
-const CameraController = ({ children }) => {
-  const { camera } = useThree();
+const Geometries = () => {
+  const { viewport, mouse } = useThree();
   const ref = useRef();
-  const [scrollY, setScrollY] = useState(0);
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const onscroll = window.addEventListener('scroll', () => {
-      setScrollY(window.scrollY);
-    });
-
-    const mousePos = window.addEventListener('mousemove', (e) => {
-      setCursor({
-        x: e.clientX / window.innerWidth - 0.5,
-        y: e.clientY / window.innerHeight - 0.5,
-      });
-    });
-
-    return () => {
-      window.removeEventListener('scroll', onscroll);
-      window.removeEventListener('mousemove', mousePos);
-    };
-  }, []);
 
   useFrame(() => {
-    camera.position.y = -((scrollY / window.innerHeight) * 7);
-    ref.current.position.z += (cursor.x - ref.current.position.z) * 0.02;
-    ref.current.position.y += (cursor.y - ref.current.position.y) * 0.02;
+    ref.current.position.z += (mouse.x / 2 - ref.current.position.z) * 0.02;
+    ref.current.position.y += (-mouse.y / 2 - ref.current.position.y) * 0.02;
   });
-  return <group ref={ref}>{children}</group>;
+
+  return (
+    <group ref={ref}>
+      <TorusKnot position={[0, 0, -viewport.width + viewport.width / 1.4]} />
+      <Cone position={[0, -viewport.height, 0 + viewport.width / 8]} />
+      <Sphere
+        position={[
+          0,
+          -viewport.height * 2,
+          -viewport.width + viewport.width / 1.4,
+        ]}
+      />
+    </group>
+  );
 };
 
 function App() {
   const cameraPosition = 6;
-  const distance = 7;
 
   return (
     <div className='App'>
@@ -197,26 +189,24 @@ function App() {
               position: [cameraPosition, 0, scrollY],
             }}
           >
-            <CameraController>
-              <fog attach='fog' color='hotpink' near={1} far={60} />
-              {/* <OrbitControls /> */}
-              <Lights />
-              <Particles amount={2000} size={0.05} spread={40} />
-              <TorusKnot position={[0, 0, -1]} />
-              <Cone position={[0, -distance, 1]} />
-              <Sphere position={[0, -distance * 2, -1]} />
-              {/* <Physics>
-              <Plane />
-            </Physics> */}
-            </CameraController>
+            <ScrollControls pages={3} distance={1} damping={5}>
+              <Scroll>
+                <fog attach='fog' color='hotpink' near={1} far={60} />
+                <Lights />
+                <Particles amount={2000} size={0.05} spread={40} />
+                <Geometries />
+              </Scroll>
+              <Scroll html className={'scroll-wrapper'}>
+                <section className='content'>
+                  <div className='section'>PORTFOLIO</div>
+                  <div className='section'>GALLERY</div>
+                  <div className='section'>CONTACT</div>
+                </section>
+              </Scroll>
+            </ScrollControls>
           </Canvas>
         </section>
       </Suspense>
-      <section className='content'>
-        <div className='section'>PORTFOLIO</div>
-        <div className='section'>GALLERY</div>
-        <div className='section'>CONTACT</div>
-      </section>
     </div>
   );
 }

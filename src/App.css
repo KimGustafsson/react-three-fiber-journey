@@ -35,7 +35,13 @@
   display: flex;
   z-index: 3;
   flex-direction: column;
+  width: 100%;
 }
+
+.scroll-wrapper {
+  width: 100%;
+}
+
 .section {
   display: flex;
   justify-content: flex-start;
@@ -54,5 +60,6 @@
 @media (max-width: 812px) {
   .section {
     font-size: calc(1rem + 2vmin);
+    margin: 0 10vw;
   }
 }
