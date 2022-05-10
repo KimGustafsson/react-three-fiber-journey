@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { usePlane, Physics, useBox } from '@react-three/cannon';
-import { OrbitControls, useHelper } from '@react-three/drei';
-import { DirectionalLightHelper } from 'three';
+import { OrbitControls } from '@react-three/drei';
+import { useControls } from 'leva';
 
 import logo from './logo.svg';
 import './App.css';
 
 const Box = (props) => {
+  const { boxScale } = useControls({ boxScale: 1 });
   const [hovered, setHover] = useState(false);
-  const [ref, api] = useBox(() => ({ scale: 1 }, { ...props }));
+  const [ref, api] = useBox(() => ({ ...props }));
 
   const onClick = () => {
     api.applyImpulse([0, 5, 2], [0, -1, 0]);
@@ -17,6 +18,7 @@ const Box = (props) => {
 
   return (
     <mesh
+      scale={boxScale}
       ref={ref}
       onClick={onClick}
       onPointerOver={(event) => setHover(true)}
@@ -87,6 +89,7 @@ const Particles = ({ amount, size, spread }) => {
 };
 
 function App() {
+  const { gravity } = useControls({ gravity: -9.81 });
   const cameraPosition = 6;
 
   return (
@@ -110,7 +113,11 @@ function App() {
           <OrbitControls />
           <Lights />
           <Particles amount={20000} size={0.05} spread={40} />
-          <Physics>
+          <Physics
+            broadphase={'SAPBroadphace'}
+            gravity={[0, gravity, 0]}
+            allowSleep={true}
+          >
             <Box position={[-1.2, 0, 0]} mass={1} />
             <Box position={[-1.2, 1, 1]} mass={1} />
             <Box position={[-1.2, 2, 2]} mass={1} />

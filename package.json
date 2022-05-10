@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^1.0.7",
+    "leva": "^0.9.25",
     "vite": "^2.8.0"
   }
 }
