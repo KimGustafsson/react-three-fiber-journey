@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { usePlane, Physics } from '@react-three/cannon';
+import { usePlane, Physics, useBox } from '@react-three/cannon';
 import { OrbitControls, useHelper } from '@react-three/drei';
 import { DirectionalLightHelper } from 'three';
 
@@ -8,16 +8,17 @@ import logo from './logo.svg';
 import './App.css';
 
 const Box = (props) => {
-  const mesh = useRef();
   const [hovered, setHover] = useState(false);
-  const [active, setActive] = useState(false);
-  useFrame((state, delta) => (mesh.current.rotation.x += 0.01));
+  const [ref, api] = useBox(() => ({ scale: 1 }, { ...props }));
+
+  const onClick = () => {
+    api.applyImpulse([0, 5, 2], [0, -1, 0]);
+  };
+
   return (
     <mesh
-      {...props}
-      ref={mesh}
-      scale={active ? 1.5 : 1}
-      onClick={(event) => setActive(!active)}
+      ref={ref}
+      onClick={onClick}
       onPointerOver={(event) => setHover(true)}
       onPointerOut={(event) => setHover(false)}
       castShadow
@@ -110,8 +111,15 @@ function App() {
           <Lights />
           <Particles amount={20000} size={0.05} spread={40} />
           <Physics>
-            <Box position={[-1.2, 0, 0]} />
-            <Box position={[1.2, 0, 0]} />
+            <Box position={[-1.2, 0, 0]} mass={1} />
+            <Box position={[-1.2, 1, 1]} mass={1} />
+            <Box position={[-1.2, 2, 2]} mass={1} />
+            <Box position={[-1.2, 3, 3]} mass={1} />
+            <Box position={[1.2, 0, 0]} mass={1} />
+            <Box position={[1.2, 1, 0]} mass={1} />
+            <Box position={[1.2, 2, 0]} mass={1} />
+            <Box position={[1.2, 3, 0]} mass={1} />
+            <Box position={[1.2, 4, 0]} mass={1} />
             <Plane />
           </Physics>
         </Canvas>
