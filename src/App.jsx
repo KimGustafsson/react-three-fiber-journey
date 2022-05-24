@@ -1,54 +1,25 @@
-import { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { usePlane, Physics, useBox } from '@react-three/cannon';
-import { OrbitControls } from '@react-three/drei';
+import { Suspense, useRef } from 'react';
+import { Canvas } from '@react-three/fiber';
+import {
+  OrbitControls,
+  Html,
+  useProgress,
+  Environment,
+} from '@react-three/drei';
 import { useControls } from 'leva';
+
+import WindTurbine from './WindTurbine';
 
 import logo from './logo.svg';
 import './App.css';
 
-const Box = (props) => {
-  const { boxScale } = useControls({ boxScale: 1 });
-  const [hovered, setHover] = useState(false);
-  const [ref, api] = useBox(() => ({ ...props }));
+function Loader() {
+  const { progress } = useProgress();
+  return <Html center>{progress} % loaded</Html>;
+}
 
-  const onClick = () => {
-    api.applyImpulse([0, 5, 2], [0, -1, 0]);
-  };
-
-  return (
-    <mesh
-      scale={boxScale}
-      ref={ref}
-      onClick={onClick}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
-      castShadow
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'blue'} />
-    </mesh>
-  );
-};
-
-const Plane = (props) => {
-  const [ref] = usePlane(() => ({
-    position: [0, -1.5, 0],
-    rotation: [-Math.PI / 2, 0, 0],
-    ...props,
-  }));
-
-  return (
-    <mesh receiveShadow ref={ref}>
-      <planeGeometry args={[20, 20]} />
-      <meshStandardMaterial color={'#282c34'} />
-    </mesh>
-  );
-};
-
-const Lights = (props) => {
+const Lights = () => {
   const light = useRef();
-  // useHelper(light, DirectionalLightHelper);
   const shadowMapSize = 512 * 2;
 
   return (
@@ -67,29 +38,7 @@ const Lights = (props) => {
   );
 };
 
-const Particles = ({ amount, size, spread }) => {
-  const positions = new Float32Array(amount * 3);
-
-  for (let i = 0; i < amount * 3; i++) {
-    positions[i] = (Math.random() - 0.5) * spread;
-  }
-  return (
-    <points>
-      <bufferGeometry>
-        <bufferAttribute
-          attachObject={['attributes', 'position']}
-          count={positions.length / 3}
-          itemSize={3}
-          array={positions}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={size} sizeAttenuation />
-    </points>
-  );
-};
-
 function App() {
-  const { gravity } = useControls({ gravity: -9.81 });
   const cameraPosition = 6;
 
   return (
@@ -109,26 +58,13 @@ function App() {
             position: [cameraPosition, cameraPosition, cameraPosition],
           }}
         >
-          <fog attach='fog' color='hotpink' near={1} far={60} />
+          <fog attach='fog' color='#CCC' near={1} far={30} />
           <OrbitControls />
           <Lights />
-          <Particles amount={20000} size={0.05} spread={40} />
-          <Physics
-            broadphase={'SAPBroadphace'}
-            gravity={[0, gravity, 0]}
-            allowSleep={true}
-          >
-            <Box position={[-1.2, 0, 0]} mass={1} />
-            <Box position={[-1.2, 1, 1]} mass={1} />
-            <Box position={[-1.2, 2, 2]} mass={1} />
-            <Box position={[-1.2, 3, 3]} mass={1} />
-            <Box position={[1.2, 0, 0]} mass={1} />
-            <Box position={[1.2, 1, 0]} mass={1} />
-            <Box position={[1.2, 2, 0]} mass={1} />
-            <Box position={[1.2, 3, 0]} mass={1} />
-            <Box position={[1.2, 4, 0]} mass={1} />
-            <Plane />
-          </Physics>
+          <Suspense fallback={<Loader />}>
+            <WindTurbine scale={0.4} position={[0, -1.5, 0]} />
+            {/* <Environment preset='forest' background /> */}
+          </Suspense>
         </Canvas>
       </section>
     </div>
