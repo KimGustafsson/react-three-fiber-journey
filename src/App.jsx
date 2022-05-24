@@ -21,19 +21,41 @@ function Loader() {
 const Lights = () => {
   const light = useRef();
   const shadowMapSize = 512 * 2;
+  const {
+    directionalLightPosition,
+    directionalLightIntencity,
+    ambientLightIntencity,
+    pointLightIntencity,
+    pointLightPosition,
+  } = useControls({
+    directionalLightPosition: [1, 3, 2],
+    directionalLightIntencity: 1.1,
+    ambientLightIntencity: 0.3,
+    pointLightIntencity: 0.1,
+    pointLightPosition: [0, 3, -4.5],
+  });
 
   return (
     <>
       <directionalLight
         ref={light}
-        position={[3, 5, 2]}
+        intensity={directionalLightIntencity}
+        position={directionalLightPosition}
         castShadow
         shadow-mapSize-height={shadowMapSize}
         shadow-mapSize-width={shadowMapSize}
         shadow-camera-near={1}
         shadow-camera-far={100}
       />
-      <ambientLight intensity={1} />
+      <ambientLight intensity={ambientLightIntencity} />
+      <pointLight
+        intensity={pointLightIntencity}
+        position={pointLightPosition}
+        shadow-mapSize-height={shadowMapSize}
+        shadow-mapSize-width={shadowMapSize}
+        shadow-camera-near={1}
+        shadow-camera-far={100}
+      />
     </>
   );
 };
