@@ -20,19 +20,15 @@ function Loader() {
 
 const Lights = () => {
   const light = useRef();
-  const shadowMapSize = 512 * 2;
+  const shadowMapSize = 1024 * 2;
   const {
     directionalLightPosition,
     directionalLightIntencity,
     ambientLightIntencity,
-    pointLightIntencity,
-    pointLightPosition,
   } = useControls({
     directionalLightPosition: [1, 3, 2],
-    directionalLightIntencity: 1.1,
-    ambientLightIntencity: 0.3,
-    pointLightIntencity: 0.1,
-    pointLightPosition: [0, 3, -4.5],
+    directionalLightIntencity: 1.35,
+    ambientLightIntencity: 1,
   });
 
   return (
@@ -42,20 +38,13 @@ const Lights = () => {
         intensity={directionalLightIntencity}
         position={directionalLightPosition}
         castShadow
+        shadow-normalBias={0.03}
         shadow-mapSize-height={shadowMapSize}
         shadow-mapSize-width={shadowMapSize}
         shadow-camera-near={1}
         shadow-camera-far={100}
       />
       <ambientLight intensity={ambientLightIntencity} />
-      <pointLight
-        intensity={pointLightIntencity}
-        position={pointLightPosition}
-        shadow-mapSize-height={shadowMapSize}
-        shadow-mapSize-width={shadowMapSize}
-        shadow-camera-near={1}
-        shadow-camera-far={100}
-      />
     </>
   );
 };
@@ -71,6 +60,7 @@ function App() {
       </header>
       <section>
         <Canvas
+          gl={{ antialias: true, physicallyCorrectLights: true }}
           shadows
           dpr={[1, 2]}
           camera={{
