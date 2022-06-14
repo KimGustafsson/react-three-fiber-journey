@@ -50,7 +50,9 @@ const Lights = () => {
 };
 
 function App() {
-  const cameraPosition = 6;
+  const cameraY = 1.5;
+  const cameraX = 1.5;
+  const cameraZ = 4.5;
 
   return (
     <div className='App'>
@@ -67,13 +69,13 @@ function App() {
             fov: 55,
             near: 0.1,
             far: 1000,
-            position: [cameraPosition, cameraPosition, cameraPosition],
+            position: [cameraX, cameraY, cameraZ],
           }}
         >
           <OrbitControls />
           <Lights />
           <Suspense fallback={<Loader />}>
-            <WindTurbine scale={0.4} position={[0, -1.5, 0]} />
+            <WindTurbine scale={0.4} position={[0, -2.9, 0]} />
             {/* <Environment preset='forest' background /> */}
           </Suspense>
         </Canvas>
