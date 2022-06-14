@@ -4,6 +4,9 @@ import { usePlane, Physics, useBox } from '@react-three/cannon';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
 
+import fragment from './fragment.glsl';
+import vertex from './vertex.glsl';
+
 import logo from './logo.svg';
 import './App.css';
 
@@ -32,16 +35,14 @@ const Box = (props) => {
 };
 
 const Plane = (props) => {
-  const [ref] = usePlane(() => ({
-    position: [0, -1.5, 0],
-    rotation: [-Math.PI / 2, 0, 0],
-    ...props,
-  }));
-
   return (
-    <mesh receiveShadow ref={ref}>
-      <planeGeometry args={[20, 20]} />
-      <meshStandardMaterial color={'#282c34'} />
+    <mesh>
+      <planeGeometry attach='geometry' args={[5, 3.5]} />
+      <rawShaderMaterial
+        attach='material'
+        vertexShader={vertex}
+        fragmentShader={fragment}
+      />
     </mesh>
   );
 };
@@ -61,8 +62,9 @@ const Lights = (props) => {
         shadow-mapSize-width={shadowMapSize}
         shadow-camera-near={1}
         shadow-camera-far={100}
+        intensity={2}
       />
-      <ambientLight intensity={1} />
+      <ambientLight intensity={2} />
     </>
   );
 };
@@ -100,6 +102,10 @@ function App() {
       </header>
       <section>
         <Canvas
+          gl={{
+            antialias: true,
+            physicallyCorrectLights: true,
+          }}
           shadows
           dpr={[1, 2]}
           camera={{
@@ -109,26 +115,9 @@ function App() {
             position: [cameraPosition, cameraPosition, cameraPosition],
           }}
         >
-          <fog attach='fog' color='hotpink' near={1} far={60} />
           <OrbitControls />
           <Lights />
-          <Particles amount={20000} size={0.05} spread={40} />
-          <Physics
-            broadphase={'SAPBroadphace'}
-            gravity={[0, gravity, 0]}
-            allowSleep={true}
-          >
-            <Box position={[-1.2, 0, 0]} mass={1} />
-            <Box position={[-1.2, 1, 1]} mass={1} />
-            <Box position={[-1.2, 2, 2]} mass={1} />
-            <Box position={[-1.2, 3, 3]} mass={1} />
-            <Box position={[1.2, 0, 0]} mass={1} />
-            <Box position={[1.2, 1, 0]} mass={1} />
-            <Box position={[1.2, 2, 0]} mass={1} />
-            <Box position={[1.2, 3, 0]} mass={1} />
-            <Box position={[1.2, 4, 0]} mass={1} />
-            <Plane />
-          </Physics>
+          <Plane />
         </Canvas>
       </section>
     </div>
