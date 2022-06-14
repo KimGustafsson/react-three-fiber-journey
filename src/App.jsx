@@ -27,8 +27,8 @@ const Lights = () => {
     ambientLightIntencity,
   } = useControls({
     directionalLightPosition: [1, 3, 2],
-    directionalLightIntencity: 1.35,
-    ambientLightIntencity: 1,
+    directionalLightIntencity: 5.35,
+    ambientLightIntencity: 5,
   });
 
   return (
@@ -38,7 +38,7 @@ const Lights = () => {
         intensity={directionalLightIntencity}
         position={directionalLightPosition}
         castShadow
-        shadow-normalBias={0.03}
+        shadow-normalBias={0.05}
         shadow-mapSize-height={shadowMapSize}
         shadow-mapSize-width={shadowMapSize}
         shadow-camera-near={1}
@@ -70,7 +70,6 @@ function App() {
             position: [cameraPosition, cameraPosition, cameraPosition],
           }}
         >
-          <fog attach='fog' color='#CCC' near={1} far={30} />
           <OrbitControls />
           <Lights />
           <Suspense fallback={<Loader />}>
