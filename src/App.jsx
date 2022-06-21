@@ -53,6 +53,7 @@ function App() {
   const cameraY = 1.5;
   const cameraX = 1.5;
   const cameraZ = 4.5;
+  const { speed } = useControls({ speed: 1 });
 
   return (
     <div className='App'>
@@ -75,7 +76,7 @@ function App() {
           <OrbitControls />
           <Lights />
           <Suspense fallback={<Loader />}>
-            <WindTurbine scale={0.4} position={[0, -2.9, 0]} />
+            <WindTurbine speed={speed} scale={0.4} position={[0, -2.9, 0]} />
             {/* <Environment preset='forest' background /> */}
           </Suspense>
         </Canvas>

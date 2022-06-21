@@ -1,15 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import { useGLTF, useAnimations } from '@react-three/drei';
 
-export default function Model(props) {
+export default function Model({ speed = 1, ...rest }) {
   const group = useRef();
-  const { nodes, materials, animations } = useGLTF('/turbine_anim.glb');
+  const { nodes, animations } = useGLTF('/turbine_anim.glb');
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
     actions?.KnoppenAction.play();
+    actions?.KnoppenAction.setEffectiveTimeScale(speed);
   });
   return (
-    <group ref={group} {...props} dispose={null}>
+    <group ref={group} {...rest} dispose={null}>
       <group name='Scene'>
         <mesh
           name='Pole'
