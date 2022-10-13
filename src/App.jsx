@@ -1,22 +1,11 @@
-import { Suspense, useRef } from 'react';
+import { useRef } from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import {
-  OrbitControls,
-  Html,
-  useProgress,
-  Environment,
-} from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
-
-import WindTurbine from './WindTurbine';
 
 import logo from './logo.svg';
 import './App.css';
-
-function Loader() {
-  const { progress } = useProgress();
-  return <Html center>{progress} % loaded</Html>;
-}
 
 const Lights = () => {
   const light = useRef();
@@ -49,11 +38,28 @@ const Lights = () => {
   );
 };
 
+const Plane = () => {
+  return (
+    <mesh rotation-x={-Math.PI / 2} receiveShadow>
+      <planeBufferGeometry args={[50, 50]} />
+      <meshBasicMaterial color={'#004000'} side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
+
+const House = () => {
+  return (
+    <mesh>
+      <boxBufferGeometry args={[10, 3, 15]} />
+      <meshBasicMaterial color={'#330000'} side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
+
 function App() {
-  const cameraY = 1.5;
-  const cameraX = 1.5;
-  const cameraZ = 4.5;
-  const { speed } = useControls({ speed: 1 });
+  const cameraY = 2.5 * 7;
+  const cameraX = 1.5 * 7;
+  const cameraZ = 4.5 * 7;
 
   return (
     <div className='App'>
@@ -67,18 +73,16 @@ function App() {
           shadows
           dpr={[1, 2]}
           camera={{
-            fov: 55,
+            fov: 70,
             near: 0.1,
             far: 1000,
             position: [cameraX, cameraY, cameraZ],
           }}
         >
           <OrbitControls />
+          <Plane />
+          <House />
           <Lights />
-          <Suspense fallback={<Loader />}>
-            <WindTurbine speed={speed} scale={0.4} position={[0, -2.9, 0]} />
-            {/* <Environment preset='forest' background /> */}
-          </Suspense>
         </Canvas>
       </section>
     </div>
