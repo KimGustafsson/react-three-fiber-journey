@@ -31,8 +31,8 @@ const Floor = () => {
 
 const Box = () => {
   const ref = useRef();
-  const { boxPosition, boxRotationSpeed, boxColor } = useControls({
-    boxPosition: {
+  const { position, rotationModifier, color } = useControls('box', {
+    position: {
       value: {
         positionX: 2,
         positionY: 0,
@@ -40,37 +40,33 @@ const Box = () => {
       },
       step: 0.1,
     },
-    boxRotationSpeed: {
+    rotationModifier: {
       value: 0,
       step: 0.001,
     },
-    boxColor: '#000000',
+    color: '#000000',
   });
 
   useFrame((_state, d) => {
-    ref.current.rotation.y += -d - boxRotationSpeed;
-    ref.current.rotation.x += d + boxRotationSpeed;
+    ref.current.rotation.y += -d - rotationModifier;
+    ref.current.rotation.x += d + rotationModifier;
   });
 
   return (
     <mesh
       scale={1.5}
-      position={[
-        boxPosition.positionX,
-        boxPosition.positionY,
-        boxPosition.positionZ,
-      ]}
+      position={[position.positionX, position.positionY, position.positionZ]}
       ref={ref}
     >
       <boxGeometry />
-      <meshStandardMaterial color={boxColor} />
+      <meshStandardMaterial color={color} />
     </mesh>
   );
 };
 
 const Sphere = () => {
-  const { spherePosition, sphereColor } = useControls({
-    spherePosition: {
+  const { position, color } = useControls('sphere', {
+    position: {
       value: {
         positionX: -2,
         positionY: 0,
@@ -78,21 +74,17 @@ const Sphere = () => {
       },
       step: 0.1,
     },
-    sphereColor: '#000000',
+    color: '#000000',
     alert: button(() => alert('Yoo')),
   });
 
   return (
     <mesh
       scale={1.5}
-      position={[
-        spherePosition.positionX,
-        spherePosition.positionY,
-        spherePosition.positionZ,
-      ]}
+      position={[position.positionX, position.positionY, position.positionZ]}
     >
       <sphereGeometry />
-      <meshStandardMaterial color={sphereColor} />
+      <meshStandardMaterial color={color} />
     </mesh>
   );
 };
