@@ -1,39 +1,98 @@
 import { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { button, useControls } from 'leva';
+import {
+  MeshReflectorMaterial,
+  OrbitControls,
+  Text,
+  Float,
+} from '@react-three/drei';
 
 import logo from './logo.svg';
 import './App.css';
 
+const BASE_COLOR = '#111111';
+const TEXT_COLOR = 'whitesmoke';
+
 const Floor = () => {
   return (
-    <mesh scale={10} rotation-x={-Math.PI / 2} position-y={-3} receiveShadow>
+    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
       <planeGeometry />
-      <meshStandardMaterial color={'greenyellow'} />
+      <MeshReflectorMaterial
+        resolution={512}
+        blur={[1000, 1000]}
+        mixBlur={1}
+        mirror={1}
+        color={BASE_COLOR}
+      />
     </mesh>
   );
 };
 
 const Box = () => {
   const ref = useRef();
+  const { boxPosition, boxRotationSpeed, boxColor } = useControls({
+    boxPosition: {
+      value: {
+        positionX: 2,
+        positionY: 0,
+        positionZ: 0,
+      },
+      step: 0.1,
+    },
+    boxRotationSpeed: {
+      value: 0,
+      step: 0.001,
+    },
+    boxColor: '#000000',
+  });
+
   useFrame((_state, d) => {
-    ref.current.rotation.y += -d;
-    ref.current.rotation.x += d;
+    ref.current.rotation.y += -d - boxRotationSpeed;
+    ref.current.rotation.x += d + boxRotationSpeed;
   });
 
   return (
-    <mesh scale={1.5} position-x={2} ref={ref} castShadow receiveShadow>
+    <mesh
+      scale={1.5}
+      position={[
+        boxPosition.positionX,
+        boxPosition.positionY,
+        boxPosition.positionZ,
+      ]}
+      ref={ref}
+    >
       <boxGeometry />
-      <meshStandardMaterial color={'orange'} />
+      <meshStandardMaterial color={boxColor} />
     </mesh>
   );
 };
 
 const Sphere = () => {
+  const { spherePosition, sphereColor } = useControls({
+    spherePosition: {
+      value: {
+        positionX: -2,
+        positionY: 0,
+        positionZ: 0,
+      },
+      step: 0.1,
+    },
+    sphereColor: '#000000',
+    alert: button(() => alert('Yoo')),
+  });
+
   return (
-    <mesh scale={1.5} position-x={-2} castShadow receiveShadow>
+    <mesh
+      scale={1.5}
+      position={[
+        spherePosition.positionX,
+        spherePosition.positionY,
+        spherePosition.positionZ,
+      ]}
+    >
       <sphereGeometry />
-      <meshStandardMaterial color={'mediumpurple'} />
+      <meshStandardMaterial color={sphereColor} />
     </mesh>
   );
 };
@@ -41,12 +100,7 @@ const Sphere = () => {
 const Lights = () => {
   return (
     <>
-      <pointLight
-        position={[2, 5, -3]}
-        intensity={3}
-        color={'pink'}
-        castShadow
-      />
+      <pointLight position={[-5, 8, 5]} intensity={2} color={'whitesmoke'} />
       <ambientLight intensity={0.3} />
     </>
   );
@@ -55,20 +109,28 @@ const Lights = () => {
 const Scene = () => {
   const ref = useRef();
   return (
-    <>
+    <group ref={ref}>
+      <Box />
+      <Sphere />
+      <Float>
+        <Text
+          fontSize={0.5}
+          position-y={2}
+          font={'inter-v12-latin-regular.woff'}
+          color={TEXT_COLOR}
+        >
+          REACT-THREE-FIBER
+        </Text>
+      </Float>
       <Floor />
-      <group ref={ref}>
-        <Box />
-        <Sphere />
-      </group>
-    </>
+    </group>
   );
 };
 
 function App() {
   const cameraY = 2;
   const cameraX = 0;
-  const cameraZ = -8;
+  const cameraZ = 15;
 
   return (
     <div className='App'>
@@ -88,8 +150,9 @@ function App() {
             position: [cameraX, cameraY, cameraZ],
           }}
         >
-          <color args={['#111111']} attach='background' />
+          <color args={[BASE_COLOR]} attach='background' />
           <OrbitControls makeDefault />
+          <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
           <Suspense fallback={null}>
             <Lights />
             <Scene />
