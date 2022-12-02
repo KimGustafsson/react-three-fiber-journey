@@ -23,7 +23,7 @@ const Floor = () => {
     <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
       <planeGeometry />
       <MeshReflectorMaterial
-        resolution={512}
+        resolution={512 * 4}
         blur={[1000, 1000]}
         mixBlur={0.5}
         mirror={1}
