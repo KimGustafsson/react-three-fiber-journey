@@ -1,6 +1,7 @@
 import { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { button, useControls } from 'leva';
+import { Perf } from 'r3f-perf';
 import {
   MeshReflectorMaterial,
   OrbitControls,
@@ -120,6 +121,9 @@ const Scene = () => {
 };
 
 function App() {
+  const { perf } = useControls({
+    perf: true,
+  });
   const cameraY = 2;
   const cameraX = 0;
   const cameraZ = 15;
@@ -142,6 +146,7 @@ function App() {
             position: [cameraX, cameraY, cameraZ],
           }}
         >
+          {perf && <Perf position='bottom-left' />}
           <color args={[BASE_COLOR]} attach='background' />
           <OrbitControls makeDefault />
           <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
