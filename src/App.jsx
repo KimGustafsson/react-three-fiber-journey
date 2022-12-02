@@ -7,24 +7,27 @@ import {
   OrbitControls,
   Text,
   Float,
+  Stars,
 } from '@react-three/drei';
 
 import logo from './logo.svg';
 import './App.css';
 
 const BASE_COLOR = '#111111';
+// const BASE_COLOR = 'white';
 const TEXT_COLOR = 'whitesmoke';
 
 const Floor = () => {
+  const { floorColor } = useControls({ floorColor: 'purple' });
   return (
     <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
       <planeGeometry />
       <MeshReflectorMaterial
         resolution={512}
         blur={[1000, 1000]}
-        mixBlur={1}
+        mixBlur={0.5}
         mirror={1}
-        color={BASE_COLOR}
+        color={floorColor}
       />
     </mesh>
   );
@@ -91,10 +94,20 @@ const Sphere = () => {
 };
 
 const Lights = () => {
+  const { lightColor, lightIntensity, ambient } = useControls('lights', {
+    lightColor: 'whitesmoke',
+    lightIntensity: 2,
+    ambient: 0.3,
+  });
+
   return (
     <>
-      <pointLight position={[-5, 8, 5]} intensity={2} color={'whitesmoke'} />
-      <ambientLight intensity={0.3} />
+      <pointLight
+        position={[-5, 8, 5]}
+        intensity={lightIntensity}
+        color={lightColor}
+      />
+      <ambientLight intensity={ambient} />
     </>
   );
 };
@@ -121,8 +134,9 @@ const Scene = () => {
 };
 
 function App() {
-  const { perf } = useControls({
+  const { perf, stars } = useControls({
     perf: true,
+    stars: true,
   });
   const cameraY = 2;
   const cameraX = 0;
@@ -136,7 +150,7 @@ function App() {
       </header>
       <section>
         <Canvas
-          gl={{ antialias: false, physicallyCorrectLights: false }}
+          gl={{ antialias: true }}
           dpr={[1, 2]}
           shadows
           camera={{
@@ -147,8 +161,9 @@ function App() {
           }}
         >
           {perf && <Perf position='bottom-left' />}
+          {stars && <Stars />}
           <color args={[BASE_COLOR]} attach='background' />
-          <OrbitControls makeDefault />
+          <OrbitControls makeDefault maxPolarAngle={Math.PI / 2} />
           <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
           <Suspense fallback={null}>
             <Lights />
