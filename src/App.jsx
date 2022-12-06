@@ -1,44 +1,92 @@
 import { Suspense, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { button, useControls } from 'leva';
 import { Perf } from 'r3f-perf';
+import { useGesture } from '@use-gesture/react';
+import { useSpring, a } from '@react-spring/three';
 import {
   MeshReflectorMaterial,
   OrbitControls,
   Text,
   Float,
   Stars,
+  softShadows,
 } from '@react-three/drei';
 
 import logo from './logo.svg';
 import './App.css';
 
 const BASE_COLOR = '#111111';
-// const BASE_COLOR = 'white';
 const TEXT_COLOR = 'whitesmoke';
 
-const Floor = () => {
-  const { floorColor } = useControls({ floorColor: 'purple' });
+// softShadows({
+//   frustum: 3.75,
+//   size: 0.005,
+//   near: 9.5,
+//   samples: 17,
+//   rings: 11,
+// });
+
+const Dodecahedron = () => {
+  const { viewport, size } = useThree();
+  const aspect = size.width / viewport.width;
+
+  const [spring, set] = useSpring(() => ({
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    config: { friction: 15 },
+  }));
+
+  const bind = useGesture({
+    onDrag: ({ offset: [x, y] }) =>
+      set({
+        position: [x / aspect, -y / aspect, 0],
+        rotation: [y / aspect, x / aspect, 0],
+      }),
+  });
+
   return (
-    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
+    <a.mesh style={{ touchAction: 'none' }} {...spring} {...bind()} castShadow>
+      <dodecahedronBufferGeometry />
+      <meshNormalMaterial />
+    </a.mesh>
+  );
+};
+
+// Mat floor with shadows
+const Floor = () => {
+  const { floorColor } = useControls({ floorColor: '#272727' });
+  return (
+    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5} receiveShadow>
       <planeGeometry />
-      <MeshReflectorMaterial
-        resolution={512 * 4}
-        blur={[1000, 1000]}
-        mixBlur={0.5}
-        mirror={1}
-        color={floorColor}
-      />
+      <meshPhongMaterial color={floorColor} />
     </mesh>
   );
 };
+
+// Shiny floor
+// const Floor = () => {
+//   const { floorColor } = useControls({ floorColor: 'purple' });
+//   return (
+//     <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
+//       <planeGeometry />
+//       <MeshReflectorMaterial
+//         resolution={512 * 4}
+//         blur={[1000, 1000]}
+//         mixBlur={0.5}
+//         mirror={1}
+//         color={floorColor}
+//       />
+//     </mesh>
+//   );
+// };
 
 const Box = () => {
   const ref = useRef();
   const { position, rotationModifier, color } = useControls('box', {
     position: {
       value: {
-        positionX: 2,
+        positionX: 3,
         positionY: 0,
         positionZ: 0,
       },
@@ -58,6 +106,7 @@ const Box = () => {
 
   return (
     <mesh
+      castShadow
       scale={1.5}
       position={[position.positionX, position.positionY, position.positionZ]}
       ref={ref}
@@ -72,7 +121,7 @@ const Sphere = () => {
   const { position, color } = useControls('sphere', {
     position: {
       value: {
-        positionX: -2,
+        positionX: -3,
         positionY: 0,
         positionZ: 0,
       },
@@ -84,6 +133,7 @@ const Sphere = () => {
 
   return (
     <mesh
+      castShadow
       scale={1.5}
       position={[position.positionX, position.positionY, position.positionZ]}
     >
@@ -103,9 +153,17 @@ const Lights = () => {
   return (
     <>
       <pointLight
+        castShadow
         position={[-5, 8, 5]}
         intensity={lightIntensity}
         color={lightColor}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-near={1}
+        shadow-camera-far={50}
+        shadow-camera-top={7}
+        shadow-camera-right={5}
+        shadow-camera-bottom={-5}
+        shadow-camera-left={-5}
       />
       <ambientLight intensity={ambient} />
     </>
@@ -116,6 +174,7 @@ const Scene = () => {
   const ref = useRef();
   return (
     <group ref={ref}>
+      <Dodecahedron />
       <Box />
       <Sphere />
       <Float>
@@ -150,9 +209,9 @@ function App() {
       </header>
       <section>
         <Canvas
+          shadows
           gl={{ antialias: true }}
           dpr={[1, 2]}
-          shadows
           camera={{
             fov: 55,
             near: 0.1,
@@ -163,7 +222,11 @@ function App() {
           {perf && <Perf position='bottom-left' />}
           {stars && <Stars />}
           <color args={[BASE_COLOR]} attach='background' />
-          <OrbitControls makeDefault maxPolarAngle={Math.PI / 2} />
+          {/* <OrbitControls
+            makeDefault
+            maxPolarAngle={Math.PI / 2}
+            enableDamping
+          /> */}
           <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
           <Suspense fallback={null}>
             <Lights />
