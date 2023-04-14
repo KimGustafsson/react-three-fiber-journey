@@ -10,7 +10,6 @@ import {
   Text,
   Float,
   Stars,
-  softShadows,
 } from '@react-three/drei';
 
 import logo from './logo.svg';
@@ -18,14 +17,6 @@ import './App.css';
 
 const BASE_COLOR = '#111111';
 const TEXT_COLOR = 'whitesmoke';
-
-// softShadows({
-//   frustum: 3.75,
-//   size: 0.005,
-//   near: 9.5,
-//   samples: 17,
-//   rings: 11,
-// });
 
 const Dodecahedron = () => {
   const { viewport, size } = useThree();
@@ -54,7 +45,7 @@ const Dodecahedron = () => {
 };
 
 // Mat floor with shadows
-const Floor = () => {
+const MatFloor = () => {
   const { floorColor } = useControls({ floorColor: '#272727' });
   return (
     <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5} receiveShadow>
@@ -65,21 +56,21 @@ const Floor = () => {
 };
 
 // Shiny floor
-// const Floor = () => {
-//   const { floorColor } = useControls({ floorColor: 'purple' });
-//   return (
-//     <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
-//       <planeGeometry />
-//       <MeshReflectorMaterial
-//         resolution={512 * 4}
-//         blur={[1000, 1000]}
-//         mixBlur={0.5}
-//         mirror={1}
-//         color={floorColor}
-//       />
-//     </mesh>
-//   );
-// };
+const ShinyFloor = () => {
+  const { floorColor } = useControls({ floorColor: 'purple' });
+  return (
+    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
+      <planeGeometry />
+      <MeshReflectorMaterial
+        resolution={512 * 4}
+        blur={[1000, 1000]}
+        mixBlur={0.5}
+        mirror={1}
+        color={floorColor}
+      />
+    </mesh>
+  );
+};
 
 const Box = () => {
   const ref = useRef();
@@ -170,7 +161,7 @@ const Lights = () => {
   );
 };
 
-const Scene = () => {
+const Scene = ({ floorType }) => {
   const ref = useRef();
   return (
     <group ref={ref}>
@@ -187,15 +178,17 @@ const Scene = () => {
           REACT-THREE-FIBER
         </Text>
       </Float>
-      <Floor />
+      {floorType === 'mat' ? <MatFloor /> : <ShinyFloor />}
     </group>
   );
 };
 
 function App() {
-  const { perf, stars } = useControls({
+  const { perf, stars, orbitControlsOn, floorType } = useControls({
     perf: true,
     stars: true,
+    orbitControlsOn: true,
+    floorType: ['mat', 'shiny'],
   });
   const cameraY = 2;
   const cameraX = 0;
@@ -207,33 +200,33 @@ function App() {
         <img src={logo} className='App-logo' alt='logo' />
         <h5 className='App-title'>Three.js Journey with react-three-fiber</h5>
       </header>
-      <section>
-        <Canvas
-          shadows
-          gl={{ antialias: true }}
-          dpr={[1, 2]}
-          camera={{
-            fov: 55,
-            near: 0.1,
-            far: 1000,
-            position: [cameraX, cameraY, cameraZ],
-          }}
-        >
-          {perf && <Perf position='bottom-left' />}
-          {stars && <Stars />}
-          <color args={[BASE_COLOR]} attach='background' />
-          {/* <OrbitControls
+      <Canvas
+        shadows
+        gl={{ antialias: true }}
+        dpr={[1, 2]}
+        camera={{
+          fov: 55,
+          near: 0.1,
+          far: 1000,
+          position: [cameraX, cameraY, cameraZ],
+        }}
+      >
+        {perf && <Perf position='bottom-left' />}
+        {stars && <Stars />}
+        <color args={[BASE_COLOR]} attach='background' />
+        {orbitControlsOn && (
+          <OrbitControls
             makeDefault
             maxPolarAngle={Math.PI / 2}
             enableDamping
-          /> */}
-          <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
-          <Suspense fallback={null}>
-            <Lights />
-            <Scene />
-          </Suspense>
-        </Canvas>
-      </section>
+          />
+        )}
+        <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
+        <Suspense fallback={null}>
+          <Lights />
+          <Scene floorType={floorType} />
+        </Suspense>
+      </Canvas>
     </div>
   );
 }

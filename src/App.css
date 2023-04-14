@@ -1,13 +1,12 @@
 @font-face {
   font-family: Inter;
-  src:url("/inter-v12-latin-regular.woff");
+  src: url('/inter-v12-latin-regular.woff');
 }
 
 .App {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  text-align: center;
+  position: relative;
+  height: 100vh;
+  width: 100vw;
 }
 
 .App-logo {
@@ -22,18 +21,7 @@
   align-items: center;
   font-size: calc(10px + 2vmin);
   color: whitesmoke;
-  /* color: #111; */
   pointer-events: none;
   user-select: none;
   z-index: 2;
-}
-
-section {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-section > * {
-  flex: 1;
 }
