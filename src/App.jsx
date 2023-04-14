@@ -6,6 +6,7 @@ import { useGesture } from '@use-gesture/react';
 import { useSpring, a } from '@react-spring/three';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import Unicorn from './Models/Unicorn';
+import Dog from './Models/Dog';
 import {
   MeshReflectorMaterial,
   OrbitControls,
@@ -171,8 +172,9 @@ const Scene = ({ floorType }) => {
     <group ref={ref}>
       <Box />
       <Dodecahedron />
-      <Sphere />
-      <Unicorn position={[0, 1, 0]} />
+      {/* <Sphere /> */}
+      <Dog scale={2} position={[-6, 0, 0]} />
+      <Unicorn position={[0, 0, 0]} />
       <Float>
         <Text
           castShadow
