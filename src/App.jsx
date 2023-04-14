@@ -4,26 +4,30 @@ import { button, useControls } from 'leva';
 import { Perf } from 'r3f-perf';
 import { useGesture } from '@use-gesture/react';
 import { useSpring, a } from '@react-spring/three';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import Unicorn from './Models/Unicorn';
 import {
   MeshReflectorMaterial,
   OrbitControls,
   Text,
   Float,
   Stars,
+  ContactShadows,
+  Environment,
 } from '@react-three/drei';
 
 import logo from './logo.svg';
 import './App.css';
 
 const BASE_COLOR = '#111111';
-const TEXT_COLOR = 'whitesmoke';
+const TEXT_COLOR = 'indigo';
 
 const Dodecahedron = () => {
   const { viewport, size } = useThree();
   const aspect = size.width / viewport.width;
 
   const [spring, set] = useSpring(() => ({
-    position: [0, 0, 0],
+    position: [-3, 2, 0],
     rotation: [0, 0, 0],
     config: { friction: 15 },
   }));
@@ -48,7 +52,7 @@ const Dodecahedron = () => {
 const MatFloor = () => {
   const { floorColor } = useControls({ floorColor: '#272727' });
   return (
-    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5} receiveShadow>
+    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
       <planeGeometry />
       <meshPhongMaterial color={floorColor} />
     </mesh>
@@ -59,7 +63,7 @@ const MatFloor = () => {
 const ShinyFloor = () => {
   const { floorColor } = useControls({ floorColor: 'purple' });
   return (
-    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={-1.5}>
+    <mesh scale={70} rotation-x={-Math.PI / 2} position-y={0}>
       <planeGeometry />
       <MeshReflectorMaterial
         resolution={512 * 4}
@@ -78,7 +82,7 @@ const Box = () => {
     position: {
       value: {
         positionX: 3,
-        positionY: 0,
+        positionY: 2,
         positionZ: 0,
       },
       step: 0.1,
@@ -112,8 +116,8 @@ const Sphere = () => {
   const { position, color } = useControls('sphere', {
     position: {
       value: {
-        positionX: -3,
-        positionY: 0,
+        positionX: -6,
+        positionY: 2,
         positionZ: 0,
       },
       step: 0.1,
@@ -165,17 +169,19 @@ const Scene = ({ floorType }) => {
   const ref = useRef();
   return (
     <group ref={ref}>
-      <Dodecahedron />
       <Box />
+      <Dodecahedron />
       <Sphere />
+      <Unicorn position={[0, 1, 0]} />
       <Float>
         <Text
-          fontSize={0.5}
-          position-y={2}
+          castShadow
+          fontSize={1}
+          position-y={6}
           font={'inter-v12-latin-regular.woff'}
           color={TEXT_COLOR}
         >
-          REACT-THREE-FIBER
+          NELIA
         </Text>
       </Float>
       {floorType === 'mat' ? <MatFloor /> : <ShinyFloor />}
@@ -188,11 +194,16 @@ function App() {
     perf: true,
     stars: true,
     orbitControlsOn: true,
-    floorType: ['mat', 'shiny'],
+    floorType: { value: 'mat', options: ['mat', 'shiny'] },
   });
-  const cameraY = 2;
+  const { bloomIntensity, luminanceThreshold } = useControls('effects', {
+    bloomIntensity: 1.8,
+    luminanceThreshold: 0.5,
+  });
+
+  const cameraY = 10;
   const cameraX = 0;
-  const cameraZ = 15;
+  const cameraZ = 18;
 
   return (
     <div className='App'>
@@ -224,8 +235,15 @@ function App() {
         <fog args={[BASE_COLOR, 20, 40]} attach={'fog'} />
         <Suspense fallback={null}>
           <Lights />
+          <Environment intensity={2} preset='night' />
           <Scene floorType={floorType} />
         </Suspense>
+        {/* <EffectComposer>
+          <Bloom
+            intensity={bloomIntensity}
+            luminanceThreshold={luminanceThreshold}
+          />
+        </EffectComposer> */}
       </Canvas>
     </div>
   );
